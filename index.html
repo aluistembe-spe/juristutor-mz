@@ -85,14 +85,11 @@
                     body: JSON.stringify({ prompt: text })
                 });
 
-                const data = await response.json();
-                loadingMsg.remove();
-
-                if (data.text) {
-                    chatBox.innerHTML += `<div class="ai-msg p-4 text-sm shadow-sm max-w-[95%] whitespace-pre-line text-slate-800">${data.text}</div>`;
-                } else {
-                    throw new Error("Resposta vazia");
-                }
+               if (data.text) {
+    chatBox.innerHTML += `<div class="ai-msg p-4 text-sm shadow-sm max-w-[95%] whitespace-pre-line text-slate-800">${data.text}</div>`;
+} else {
+    throw new Error("Resposta vazia");
+}
             } catch (error) {
                 console.error("Erro na requisição:", error);
                 loadingMsg.className = "ai-msg p-3 text-sm text-red-700 bg-red-50 border-left-red-700";
@@ -117,3 +114,4 @@
 </body>
 
 </html>
+
