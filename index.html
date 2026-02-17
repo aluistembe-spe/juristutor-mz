@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JurisTutor MZ 🇲🇿</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .glass { background: rgba(255, 255, 255, 0.98); }
+        body { background: #0f172a; min-height: 100vh; font-family: 'Inter', sans-serif; }
+        .user-msg { background: #e2e8f0; align-self: flex-end; border-radius: 15px 15px 0 15px; border: 1px solid #cbd5e1; }
+        .ai-msg { background: #dcfce7; align-self: flex-start; border-radius: 15px 15px 15px 0; border-left: 4px solid #166534; }
+        /* Custom scrollbar para parecer mais profissional */
+        #chat-box::-webkit-scrollbar { width: 6px; }
+        #chat-box::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    </style>
+</head>
+<body class="p-4 md:p-8 flex justify-center">
+
+    <div class="w-full max-w-3xl glass rounded-2xl shadow-2xl flex flex-col overflow-hidden h-[90vh]">
+        <div class="bg-emerald-900 p-5 text-white flex justify-between items-center shadow-md">
+            <div>
+                <h1 class="text-xl font-bold italic text-yellow-400">JurisTutor Moçambique</h1>
+                <p class="text-xs opacity-80 font-medium">Metodologia Jurídica: CRM, Código Civil e CPP</p>
+            </div>
+            <div class="text-right">
+                <span class="text-2xl">⚖️</span>
+            </div>
+        </div>
+
+        <div id="chat-box" class="flex-1 overflow-y-auto p-6 space-y-4 flex flex-col bg-slate-50">
+            <div class="ai-msg p-4 text-sm shadow-sm max-w-[90%] text-emerald-900">
+                <b>Saudações, colega.</b><br>
+                Sou o seu tutor jurídico virtual. Introduza os factos do seu <b>caso prático</b> para análise metodológica com base no ordenamento jurídico moçambicano.
+            </div>
+        </div>
+
+        <div class="p-4 bg-white border-t border-gray-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+            <div class="flex gap-2 items-center">
+                <textarea id="user-input" 
+                    class="flex-1 p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-sm transition-all" 
+                    placeholder="Ex: Tício, com intenção de matar, desfere um golpe contra..." 
+                    rows="2"></textarea>
+                <button id="send-btn" 
+                    class="bg-emerald-700 hover:bg-emerald-900 text-white px-6 py-3 rounded-xl transition-all font-bold shadow-lg flex items-center gap-2">
+                    <span>Analisar</span>
+                </button>
+            </div>
+            <p class="text-[10px] text-gray-400 mt-2 text-center italic">
+                Atenção: Esta IA é uma ferramenta de apoio ao estudo. Consulte sempre a legislação oficial no Boletim da República.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            const inputField = document.getElementById('user-input');
+            const chatBox = document.getElementById('chat-box');
+            const sendBtn = document.getElementById('send-btn');
+            const text = inputField.value.trim();
+
+            if (!text) return;
+
+            // Bloquear botão e input enquanto processa
+            sendBtn.disabled = true;
+            inputField.disabled = true;
+
+            // Adicionar pergunta do aluno à tela
+            chatBox.innerHTML += `<div class="user-msg p-3 text-sm shadow-sm max-w-[85%] text-slate-700">${text}</div>`;
+            inputField.value = "";
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // Criar balão de "Pensando"
+            const loadingMsg = document.createElement('div');
+            loadingMsg.className = "ai-msg p-3 text-sm italic animate-pulse text-emerald-700";
+            loadingMsg.innerText = "Consultando a legislação e preparando subsunção jurídica...";
+            chatBox.appendChild(loadingMsg);
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            try {
+                // ESTA É A PARTE QUE FALA COM O SEU BACKEND (O SEU NOVO SEGURANÇA)
+                const response = await fetch('/api/analisar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: text })
+                });
+
+                const data = await response.json();
+                loadingMsg.remove();
+
+                if (data.text) {
+                    chatBox.innerHTML += `<div class="ai-msg p-4 text-sm shadow-sm max-w-[95%] whitespace-pre-line text-slate-800">${data.text}</div>`;
+                } else {
+                    throw new Error("Resposta vazia");
+                }
+            } catch (error) {
+                console.error("Erro na requisição:", error);
+                loadingMsg.className = "ai-msg p-3 text-sm text-red-700 bg-red-50 border-left-red-700";
+                loadingMsg.innerHTML = "<b>Erro:</b> Não foi possível conectar ao servidor. Certifique-se de que a função API está configurada no Vercel.";
+                loadingMsg.classList.remove('animate-pulse');
+            } finally {
+                sendBtn.disabled = false;
+                inputField.disabled = false;
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+        }
+
+        // Eventos de clique e tecla Enter
+        document.getElementById('send-btn').addEventListener('click', sendMessage);
+        document.getElementById('user-input').addEventListener('keypress', (e) => {
+            if(e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
