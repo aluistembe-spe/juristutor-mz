@@ -1,38 +1,38 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+// api/analisar.js
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-export default async function handler(req, res) {
-    // Configuração de Headers para evitar bloqueios de CORS
-    res.setHeader('Access-Control-Allow-Credentials', true);
+module.exports = async (req, res) => {
+    // Configuração de Headers para permitir a comunicação
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-    res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
     if (req.method === 'OPTIONS') {
-        res.status(200).end();
-        return;
+        return res.status(200).end();
     }
 
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Método não permitido' });
     }
 
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ 
-        model: "gemini-1.5-flash",
-        systemInstruction: "Você é um Professor de Direito moçambicano. Responda com base na CRM e códigos vigentes em Moçambique."
-    });
-
     try {
+        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+        const model = genAI.getGenerativeModel({ 
+            model: "gemini-1.5-flash",
+            systemInstruction: "Você é um Professor de Direito moçambicano. Analise casos práticos citando a CRM e os Códigos Penais/Civis de Moçambique."
+        });
+
         const { prompt } = req.body;
-        if (!prompt) return res.status(400).json({ error: 'Prompt vazio' });
+        if (!prompt) return res.status(400).json({ error: 'Envie um caso prático.' });
 
         const result = await model.generateContent(prompt);
         const response = await result.response;
-        
-        // Retorno obrigatório como objeto com a propriedade "text"
-        return res.status(200).json({ text: response.text() });
+        const text = response.text();
+
+        // Resposta exata que o seu index.html espera
+        return res.status(200).json({ text: text });
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ error: "Erro interno", details: error.message });
+        return res.status(500).json({ error: "Erro na IA", details: error.message });
     }
-}
+};
