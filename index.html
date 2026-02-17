@@ -10,7 +10,6 @@
         body { background: #0f172a; min-height: 100vh; font-family: 'Inter', sans-serif; }
         .user-msg { background: #e2e8f0; align-self: flex-end; border-radius: 15px 15px 0 15px; border: 1px solid #cbd5e1; }
         .ai-msg { background: #dcfce7; align-self: flex-start; border-radius: 15px 15px 15px 0; border-left: 4px solid #166534; }
-        /* Custom scrollbar para parecer mais profissional */
         #chat-box::-webkit-scrollbar { width: 6px; }
         #chat-box::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
@@ -61,16 +60,13 @@
 
             if (!text) return;
 
-            // Bloquear botão e input enquanto processa
             sendBtn.disabled = true;
             inputField.disabled = true;
 
-            // Adicionar pergunta do aluno à tela
             chatBox.innerHTML += `<div class="user-msg p-3 text-sm shadow-sm max-w-[85%] text-slate-700">${text}</div>`;
             inputField.value = "";
             chatBox.scrollTop = chatBox.scrollHeight;
 
-            // Criar balão de "Pensando"
             const loadingMsg = document.createElement('div');
             loadingMsg.className = "ai-msg p-3 text-sm italic animate-pulse text-emerald-700";
             loadingMsg.innerText = "Consultando a legislação e preparando subsunção jurídica...";
@@ -78,23 +74,32 @@
             chatBox.scrollTop = chatBox.scrollHeight;
 
             try {
-                // ESTA É A PARTE QUE FALA COM O SEU BACKEND (O SEU NOVO SEGURANÇA)
-                const response = await fetch('/api/analisar.js', {
+                const response = await fetch('/api/analisar', { // Vercel resolve o caminho automaticamente
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ prompt: text })
                 });
 
-               if (data.text) {
-    chatBox.innerHTML += `<div class="ai-msg p-4 text-sm shadow-sm max-w-[95%] whitespace-pre-line text-slate-800">${data.text}</div>`;
-} else {
-    throw new Error("Resposta vazia");
-}
+                // RETIFICAÇÃO AQUI: Criar a variável data antes de usar
+                const data = await response.json();
+
+                // Remover mensagem de loading
+                chatBox.removeChild(loadingMsg);
+
+                if (data.text) {
+                    chatBox.innerHTML += `<div class="ai-msg p-4 text-sm shadow-sm max-w-[95%] whitespace-pre-line text-slate-800">${data.text}</div>`;
+                } else if (data.error) {
+                    throw new Error(data.error);
+                } else {
+                    throw new Error("Resposta vazia do servidor");
+                }
             } catch (error) {
                 console.error("Erro na requisição:", error);
-                loadingMsg.className = "ai-msg p-3 text-sm text-red-700 bg-red-50 border-left-red-700";
-                loadingMsg.innerHTML = "<b>Erro:</b> Não foi possível conectar ao servidor. Certifique-se de que a função API está configurada no Vercel.";
-                loadingMsg.classList.remove('animate-pulse');
+                if (loadingMsg.parentNode) chatBox.removeChild(loadingMsg);
+                
+                chatBox.innerHTML += `<div class="ai-msg p-3 text-sm text-red-700 bg-red-50 border-l-4 border-red-700">
+                    <b>Erro:</b> ${error.message}. Verifique os logs na Vercel.
+                </div>`;
             } finally {
                 sendBtn.disabled = false;
                 inputField.disabled = false;
@@ -102,7 +107,6 @@
             }
         }
 
-        // Eventos de clique e tecla Enter
         document.getElementById('send-btn').addEventListener('click', sendMessage);
         document.getElementById('user-input').addEventListener('keypress', (e) => {
             if(e.key === 'Enter' && !e.shiftKey) {
@@ -112,6 +116,4 @@
         });
     </script>
 </body>
-
 </html>
-
