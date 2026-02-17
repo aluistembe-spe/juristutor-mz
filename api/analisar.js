@@ -1,7 +1,7 @@
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 module.exports = async (req, res) => {
-    // 1. Configuração de CORS para permitir a comunicação entre o site e a API
+    // Configuração de CORS para permitir a comunicação com o index.html
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -10,7 +10,6 @@ module.exports = async (req, res) => {
         return res.status(200).end();
     }
 
-    // 2. Verificação de segurança da Chave API
     if (!process.env.GEMINI_API_KEY) {
         return res.status(500).json({ error: "Erro: GEMINI_API_KEY não configurada na Vercel." });
     }
@@ -19,7 +18,7 @@ module.exports = async (req, res) => {
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
         const model = genAI.getGenerativeModel({ 
             model: "gemini-1.5-flash",
-            systemInstruction: "Você é um Professor de Direito moçambicano. Analise casos práticos citando a CRM e os códigos vigentes em Moçambique de forma didática."
+            systemInstruction: "Você é um Professor de Direito moçambicano. Analise casos práticos citando a CRM e os códigos vigentes em Moçambique."
         });
 
         const { prompt } = req.body;
@@ -27,16 +26,10 @@ module.exports = async (req, res) => {
 
         const result = await model.generateContent(prompt);
         const response = await result.response;
-        const text = response.text();
-
-        // 3. Resposta formatada para o seu index.html
-        return res.status(200).json({ text: text });
-
+        
+        return res.status(200).json({ text: response.text() });
     } catch (error) {
-        console.error("Erro na API JurisTutor:", error);
-        return res.status(500).json({ 
-            error: "Erro ao processar o caso jurídico.",
-            details: error.message 
-        });
+        console.error("Erro na API:", error);
+        return res.status(500).json({ error: "Erro interno", details: error.message });
     }
 };
