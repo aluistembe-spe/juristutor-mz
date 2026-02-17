@@ -79,7 +79,7 @@
 
             try {
                 // ESTA É A PARTE QUE FALA COM O SEU BACKEND (O SEU NOVO SEGURANÇA)
-                const response = await fetch('/api/analisar', {
+                const response = await fetch('/api/analisar.js', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ prompt: text })
@@ -115,4 +115,5 @@
         });
     </script>
 </body>
+
 </html>
