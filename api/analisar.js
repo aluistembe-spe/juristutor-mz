@@ -19,7 +19,7 @@ module.exports = async (req, res) => {
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
         const model = genAI.getGenerativeModel({ 
             model: "gemini-1.5-flash",
-            systemInstruction: "Você é um Professor de Direito moçambicano. Analise casos práticos citando a CRM e códigos de Moçambique."
+            systemInstruction: "Você é um Professor de Direito moçambicano. Analise casos práticos citando a CRM e os códigos vigentes em Moçambique de forma didática."
         });
 
         const { prompt } = req.body;
