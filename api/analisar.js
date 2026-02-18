@@ -18,6 +18,17 @@ export default async function handler(req, res) {
             model: "gemini-1.5-flash",
             systemInstruction: "Você é o JurisTutor Moçambique. Analise casos APENAS sobre Direito Moçambicano. Se a pergunta não for jurídica ou for de outro país, recuse educadamente."
         });
+        // ... código anterior de imports e CORS ...
+
+try {
+    // Verifica se é uma chamada de Cron Job (geralmente GET) ou do Chat (POST)
+    if (req.method === 'GET') {
+        return res.status(200).json({ message: "Cron Job executado com sucesso: Sistema JurisTutor Ativo." });
+    }
+
+    const { prompt } = req.body;
+    // ... restante lógica da IA ...
+}
 
         const { prompt } = req.body;
         if (!prompt) return res.status(400).json({ error: "O servidor não recebeu texto." });
@@ -30,3 +41,4 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: "Erro na IA", details: error.message });
     }
 }
+
