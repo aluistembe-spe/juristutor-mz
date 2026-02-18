@@ -14,16 +14,14 @@ module.exports = async (req, res) => {
             systemInstruction: "Você é um Professor de Direito moçambicano. Analise casos práticos citando a CRM e os códigos vigentes em Moçambique."
         });
 
-        // Garantia de leitura do corpo da mensagem
         const prompt = req.body && req.body.prompt; 
-        if (!prompt) return res.status(400).json({ error: 'O caso prático não foi recebido pelo servidor.' });
+        if (!prompt) return res.status(400).json({ error: 'O caso prático está vazio.' });
 
         const result = await model.generateContent(prompt);
         const response = await result.response;
         
         return res.status(200).json({ text: response.text() });
     } catch (error) {
-        console.error("Erro Juristutor:", error);
         return res.status(500).json({ error: "Erro na IA", details: error.message });
     }
 };
