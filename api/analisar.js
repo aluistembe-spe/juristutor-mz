@@ -1,44 +1,32 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export default async function handler(req, res) {
-    // Configurações de CORS para o seu index.html
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
     if (req.method === 'OPTIONS') return res.status(200).end();
 
-    try {
-        if (!process.env.GEMINI_API_KEY) {
-            return res.status(500).json({ error: "Chave API não configurada na Vercel." });
-        }
+    // Lógica para o Cron Job (Método GET)
+    if (req.method === 'GET') {
+        return res.status(200).json({ message: "JurisTutor MZ: Verificação diária concluída." });
+    }
 
+    // Lógica para o Chat (Método POST)
+    try {
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
         const model = genAI.getGenerativeModel({ 
             model: "gemini-1.5-flash",
-            systemInstruction: "Você é o JurisTutor Moçambique. Analise casos APENAS sobre Direito Moçambicano. Se a pergunta não for jurídica ou for de outro país, recuse educadamente."
+            systemInstruction: "Você é o JurisTutor Moçambique. Analise casos estritamente sob o Direito Moçambicano."
         });
-        // ... código anterior de imports e CORS ...
 
-try {
-    // Verifica se é uma chamada de Cron Job (geralmente GET) ou do Chat (POST)
-    if (req.method === 'GET') {
-        return res.status(200).json({ message: "Cron Job executado com sucesso: Sistema JurisTutor Ativo." });
-    }
-
-    const { prompt } = req.body;
-    // ... restante lógica da IA ...
-}
-
-        const { prompt } = req.body;
-        if (!prompt) return res.status(400).json({ error: "O servidor não recebeu texto." });
+        const { prompt } = req.body; // Recebe os dados do index.html
+        if (!prompt) return res.status(400).json({ error: "Prompt vazio." });
 
         const result = await model.generateContent(prompt);
         return res.status(200).json({ text: result.response.text() });
         
     } catch (error) {
-        // Isso fará o erro real aparecer no seu chat para sabermos o que falhou
-        return res.status(500).json({ error: "Erro na IA", details: error.message });
+        return res.status(500).json({ error: "Erro de Servidor", details: error.message });
     }
 }
-
