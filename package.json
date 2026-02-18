@@ -1,5 +1,8 @@
-const response = await fetch('/api/analisar', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' }, // Essencial para o servidor ler o JSON
-    body: JSON.stringify({ prompt: text })
-});
+{
+  "name": "juristutor-mz",
+  "version": "1.0.0",
+  "main": "api/analisar.js",
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0"
+  }
+}
