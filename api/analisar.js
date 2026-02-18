@@ -1,7 +1,8 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI } from "@google/generative-ai"; // Compatível com "type": "module"
 
 export default async function handler(req, res) {
-    // Configuração de CORS
+    // ... restante lógica de CORS e IA
+}
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -60,4 +61,5 @@ export default async function handler(req, res) {
         });
     }
 }
+
 
