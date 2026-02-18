@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export default async function handler(req, res) {
-    // Configuração de CORS para permitir a comunicação com o index.html
+    // Permite que o teu index.html fale com este servidor
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -12,23 +12,23 @@ export default async function handler(req, res) {
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
         const model = genAI.getGenerativeModel({ 
             model: "gemini-1.5-flash",
-            systemInstruction: `Você é o JurisTutor Moçambique. Sua única função é analisar questões de DIREITO MOÇAMBICANO.
-            REGRAS ESTRITAS:
-            1. Responda apenas sobre leis, códigos (Penal, Civil, Família, Trabalho, etc.) e a Constituição de Moçambique (CRM).
-            2. Se o usuário perguntar sobre QUALQUER outro assunto (culinária, outros países, tecnologia, etc.), responda: "Como tutor jurídico moçambicano, estou programado para responder apenas a questões ligadas ao Direito de Moçambique."
-            3. Use uma linguagem técnica, porém didática, citando sempre os artigos relevantes.`
+            // Este é o prompt de sistema que garante o foco apenas em Direito
+            systemInstruction: `Você é o JurisTutor Moçambique, um Professor de Direito especializado no ordenamento jurídico moçambicano. 
+            REGRAS DE RESPOSTA:
+            1. Responda APENAS a questões sobre Direito Moçambicano (CRM, Códigos Penal, Civil, Comercial, Família, Trabalho, etc.).
+            2. Se o usuário perguntar algo fora do Direito, diga: "Como tutor jurídico moçambicano, foco-me exclusivamente no Direito de Moçambique."
+            3. Cite sempre os artigos das leis vigentes em Moçambique.`
         });
 
-        // Garantia de leitura do prompt enviado pelo index.html
+        // Lê o texto que vem do teu site
         const prompt = req.body && req.body.prompt;
-        if (!prompt) return res.status(400).json({ error: 'O caso prático está vazio.' });
+        if (!prompt) return res.status(400).json({ error: 'Nenhum texto foi enviado.' });
 
         const result = await model.generateContent(prompt);
         const response = await result.response;
         
         return res.status(200).json({ text: response.text() });
     } catch (error) {
-        console.error("Erro Juristutor:", error);
-        return res.status(500).json({ error: "Erro interno", details: error.message });
+        return res.status(500).json({ error: "Falha na conexão com a IA.", details: error.message });
     }
 }
