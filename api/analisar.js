@@ -6,28 +6,18 @@ export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-    if (req.method === 'OPTIONS') {
-        return res.status(200).end();
-    }
+    if (req.method === 'OPTIONS') return res.status(200).end();
 
-    // Unificação da Lógica GET (Cron / Health Check)
+    // Suporte para Cron Jobs e Verificação (GET)
     if (req.method === 'GET') {
-        return res.status(200).json({
-            status: "Ativo",
-            message: "JurisTutor Moçambique: Verificação de rotina concluída."
-        });
-    }
-
-    // Validação do Método POST para o Chat
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: "Método não permitido" });
+        return res.status(200).json({ status: "Ativo", message: "JurisTutor MZ Online" });
     }
 
     try {
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
         const model = genAI.getGenerativeModel({ 
             model: "gemini-1.5-flash",
-            systemInstruction: "Você é o JurisTutor Moçambique, especialista em Direito Moçambicano. Responda apenas questões jurídicas de Moçambique."
+            systemInstruction: "Você é o JurisTutor Moçambique, especialista em Direito Moçambicano. Responda apenas sobre leis de Moçambique."
         });
 
         const { prompt } = req.body;
