@@ -2,7 +2,7 @@
   "crons": [
     {
       "path": "/api/analisar",
-      "schedule": "0 0 * * *"
+      "schedule": "0 8 * * *"
     }
   ]
 }
