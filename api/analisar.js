@@ -1,3 +1,8 @@
+import 'dotenv/config'; // Esta linha carrega o .env automaticamente
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+// Resto do código que enviamos anteriormente...
+
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export default async function handler(req, res) {
@@ -52,3 +57,4 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: "Erro no JurisTutor", details: error.message });
     }
 }
+
