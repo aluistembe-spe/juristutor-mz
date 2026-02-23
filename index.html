@@ -67,6 +67,48 @@
 
     <script>
         async function sendMessage() {
+    const inputField = document.getElementById('user-input');
+    const chatBox = document.getElementById('chat-box');
+    const btn = document.getElementById('send-btn');
+    const text = inputField.value.trim();
+    
+    if (!text || btn.disabled) return;
+
+    // Adiciona pergunta do utilizador
+    chatBox.innerHTML += `<div class="user-msg p-4 text-sm max-w-[85%] ml-auto shadow-sm text-slate-700"><b>Factos:</b><br>${text}</div>`;
+    inputField.value = "";
+    btn.disabled = true;
+
+    // Sinal de carregamento
+    const loaderId = "loader-" + Date.now();
+    chatBox.innerHTML += `<div id="${loaderId}" class="ai-msg p-4 text-sm italic text-slate-400 animate-pulse">Consultando legislação...</div>`;
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    try {
+        const response = await fetch('/api/analisar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt: text })
+        });
+
+        const data = await response.json();
+        document.getElementById(loaderId)?.remove();
+
+        if (data.text) {
+            chatBox.innerHTML += `<div class="ai-msg p-5 text-sm max-w-[95%] whitespace-pre-line leading-relaxed border-l-8 border-emerald-900 shadow-md">${data.text}</div>`;
+        } else {
+            // Aqui ele mostra o erro exato que vem da API
+            throw new Error(data.details || data.error || "Erro desconhecido");
+        }
+    } catch (error) {
+        document.getElementById(loaderId)?.remove();
+        chatBox.innerHTML += `<div class="ai-msg p-4 text-sm text-red-700 bg-red-50 border-red-500"><b>Erro:</b> ${error.message}</div>`;
+    } finally {
+        btn.disabled = false;
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+}
+        async function sendMessage() {
             const inputField = document.getElementById('user-input');
             const chatBox = document.getElementById('chat-box');
             const btn = document.getElementById('send-btn');
@@ -117,3 +159,4 @@
     </script>
 </body>
 </html>
+
