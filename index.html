@@ -8,56 +8,62 @@
     <style>
         .glass { background: rgba(255, 255, 255, 0.98); }
         body { background: #0f172a; min-height: 100vh; font-family: 'Inter', sans-serif; color: #1e293b; }
-        .user-msg { background: #e2e8f0; align-self: flex-end; border-radius: 15px 15px 0 15px; }
+        .user-msg { background: #e2e8f0; align-self: flex-end; border-radius: 15px 15px 0 15px; border: 1px solid #cbd5e1; }
         .ai-msg { background: #ffffff; align-self: flex-start; border-radius: 0 15px 15px 15px; border-left: 5px solid #065f46; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
         #chat-box::-webkit-scrollbar { width: 6px; }
         #chat-box::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
 </head>
 <body class="p-2 md:p-8 flex justify-center items-center">
-    <div class="w-full max-w-5xl glass rounded-2xl shadow-2xl flex flex-col md:flex-row h-[92vh] overflow-hidden">
+    <div class="w-full max-w-6xl glass rounded-2xl shadow-2xl flex flex-col md:flex-row h-[92vh] overflow-hidden">
         
-        <div class="w-full md:w-72 bg-emerald-900 p-6 text-white flex flex-col shadow-xl">
-            <h1 class="text-xl font-bold text-yellow-400 uppercase tracking-tighter mb-2">JurisTutor MZ</h1>
-            <p class="text-[10px] text-emerald-200 mb-6 uppercase tracking-widest font-semibold">Direito Moçambicano</p>
-            
-            <div class="flex-1 space-y-4 overflow-y-auto text-xs">
-                <div class="p-3 bg-emerald-800/50 rounded-lg border border-emerald-700">
-                    <b class="text-yellow-400 block mb-1">✓ LEGISLAÇÃO ATUALIZADA</b>
-                    Foco na Lei 13/2023 (Trabalho) e Código Penal 2019.
-                </div>
-                <div class="p-3 bg-emerald-800/50 rounded-lg border border-emerald-700">
-                    <b class="text-yellow-400 block mb-1">✓ DICA DE OURO</b>
-                    Introduza o caso com datas e factos claros para uma análise precisa.
-                </div>
-                <div class="p-3 bg-emerald-800/50 rounded-lg border border-emerald-700">
-                    <b class="text-yellow-400 block mb-1">⚖️ JURISPRUDÊNCIA</b>
-                    A IA busca fundamentar com base no Tribunal Supremo.
-                </div>
+        <div class="w-full md:w-80 bg-emerald-950 p-6 text-white flex flex-col shadow-2xl">
+            <div class="mb-8">
+                <h1 class="text-2xl font-black text-yellow-400 tracking-tighter uppercase">JurisTutor MZ</h1>
+                <p class="text-[10px] text-emerald-400 tracking-[0.2em] font-bold">DIREITO MOÇAMBICANO</p>
             </div>
             
-            <div class="mt-auto pt-4 border-t border-emerald-700 text-[10px] text-emerald-300 italic">
-                Uso exclusivo para fins académicos.
+            <div class="flex-1 space-y-4 overflow-y-auto pr-2">
+                <div class="text-[11px] font-bold text-emerald-500 uppercase border-b border-emerald-800 pb-1">Guia de Apoio</div>
+                <div class="p-3 bg-emerald-900/40 rounded-lg border border-emerald-800/50">
+                    <p class="text-xs leading-relaxed">Submeta casos claros com datas e factos para uma análise rigorosa.</p>
+                </div>
+
+                <div class="text-[11px] font-bold text-emerald-500 uppercase border-b border-emerald-800 pb-1 mt-6">Legislação Ativa</div>
+                <ul class="text-[11px] space-y-2 text-emerald-100">
+                    <li>🔹 Lei do Trabalho 13/2023</li>
+                    <li>🔹 Código Penal 2019</li>
+                    <li>🔹 Código Civil (Art. 10º)</li>
+                    <li>🔹 CRM (Rev. 2018)</li>
+                </ul>
+            </div>
+            
+            <div class="mt-auto pt-4 border-t border-emerald-800 text-[10px] text-emerald-500 italic">
+                Uso Académico e Profissional.
             </div>
         </div>
 
         <div class="flex-1 flex flex-col bg-slate-50 h-full">
+            <div class="md:hidden bg-emerald-900 p-4 text-white flex justify-between items-center">
+                <span class="font-bold">JurisTutor MZ</span>
+                <span class="text-xl">⚖️</span>
+            </div>
+
             <div id="chat-box" class="flex-1 overflow-y-auto p-6 space-y-6 flex flex-col">
                 <div class="ai-msg p-5 text-sm max-w-[90%] leading-relaxed">
-                    <b>Bem-vindo ao JurisTutor Moçambique.</b><br><br>
-                    Estou configurado com o ordenamento jurídico nacional. 
-                    Como posso ajudar na análise do seu caso prático hoje?
+                    <b>Bem-vindo ao JurisTutor.</b><br><br>
+                    Estou preparado para analisar casos práticos sob a legislação de Moçambique. Introduza os factos abaixo.
                 </div>
             </div>
 
-            <div class="p-4 bg-white border-t">
-                <div class="flex gap-3 items-end">
+            <div class="p-4 bg-white border-t border-slate-200">
+                <div class="flex gap-3 items-end max-w-4xl mx-auto">
                     <textarea id="user-input" 
-                        class="flex-1 p-4 border-2 border-slate-200 rounded-xl outline-none text-sm focus:border-emerald-600 transition-all resize-none" 
-                        placeholder="Descreva o caso prático aqui..." 
+                        class="flex-1 p-4 border-2 border-slate-100 rounded-xl outline-none text-sm focus:border-emerald-600 transition-all resize-none shadow-sm" 
+                        placeholder="Ex: Despedimento sem justa causa após 3 anos de serviço..." 
                         rows="2"></textarea>
                     <button id="send-btn" 
-                        class="bg-emerald-700 hover:bg-emerald-800 text-white px-6 py-4 rounded-xl font-bold transition-all shadow-lg active:scale-95 text-xs">
+                        class="bg-emerald-700 hover:bg-emerald-800 text-white px-8 py-4 rounded-xl font-bold transition-all shadow-lg active:scale-95 text-xs tracking-widest uppercase">
                         ANALISAR
                     </button>
                 </div>
@@ -67,48 +73,6 @@
 
     <script>
         async function sendMessage() {
-    const inputField = document.getElementById('user-input');
-    const chatBox = document.getElementById('chat-box');
-    const btn = document.getElementById('send-btn');
-    const text = inputField.value.trim();
-    
-    if (!text || btn.disabled) return;
-
-    // Adiciona pergunta do utilizador
-    chatBox.innerHTML += `<div class="user-msg p-4 text-sm max-w-[85%] ml-auto shadow-sm text-slate-700"><b>Factos:</b><br>${text}</div>`;
-    inputField.value = "";
-    btn.disabled = true;
-
-    // Sinal de carregamento
-    const loaderId = "loader-" + Date.now();
-    chatBox.innerHTML += `<div id="${loaderId}" class="ai-msg p-4 text-sm italic text-slate-400 animate-pulse">Consultando legislação...</div>`;
-    chatBox.scrollTop = chatBox.scrollHeight;
-
-    try {
-        const response = await fetch('/api/analisar', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt: text })
-        });
-
-        const data = await response.json();
-        document.getElementById(loaderId)?.remove();
-
-        if (data.text) {
-            chatBox.innerHTML += `<div class="ai-msg p-5 text-sm max-w-[95%] whitespace-pre-line leading-relaxed border-l-8 border-emerald-900 shadow-md">${data.text}</div>`;
-        } else {
-            // Aqui ele mostra o erro exato que vem da API
-            throw new Error(data.details || data.error || "Erro desconhecido");
-        }
-    } catch (error) {
-        document.getElementById(loaderId)?.remove();
-        chatBox.innerHTML += `<div class="ai-msg p-4 text-sm text-red-700 bg-red-50 border-red-500"><b>Erro:</b> ${error.message}</div>`;
-    } finally {
-        btn.disabled = false;
-        chatBox.scrollTop = chatBox.scrollHeight;
-    }
-}
-        async function sendMessage() {
             const inputField = document.getElementById('user-input');
             const chatBox = document.getElementById('chat-box');
             const btn = document.getElementById('send-btn');
@@ -116,15 +80,15 @@
             
             if (!text || btn.disabled) return;
 
-            // UI: Mensagem do Usuário
-            chatBox.innerHTML += `<div class="user-msg p-4 text-sm max-w-[85%] ml-auto shadow-sm"><b>Caso submetido:</b><br>${text}</div>`;
+            // UI: Mensagem do Utilizador
+            chatBox.innerHTML += `<div class="user-msg p-4 text-sm max-w-[85%] ml-auto shadow-sm text-slate-700"><b>Factos do Caso:</b><br>${text}</div>`;
             inputField.value = "";
             btn.disabled = true;
             btn.innerText = "...";
 
             // UI: Loading
             const loaderId = "loader-" + Date.now();
-            chatBox.innerHTML += `<div id="${loaderId}" class="ai-msg p-4 text-sm italic text-slate-400 animate-pulse">Consultando legislação e jurisprudência moçambicana...</div>`;
+            chatBox.innerHTML += `<div id="${loaderId}" class="ai-msg p-4 text-sm italic text-slate-400 animate-pulse border-l-4 border-slate-300">Buscando fundamentação jurídica moçambicana...</div>`;
             chatBox.scrollTop = chatBox.scrollHeight;
 
             try {
@@ -135,16 +99,19 @@
                 });
 
                 const data = await response.json();
-                document.getElementById(loaderId).remove();
+                
+                const loaderElem = document.getElementById(loaderId);
+                if(loaderElem) loaderElem.remove();
 
                 if (data.text) {
-                    chatBox.innerHTML += `<div class="ai-msg p-5 text-sm max-w-[95%] whitespace-pre-line leading-relaxed border-l-8 border-emerald-900 shadow-md">${data.text}</div>`;
+                    chatBox.innerHTML += `<div class="ai-msg p-5 text-sm max-w-[95%] whitespace-pre-line leading-relaxed border-l-8 border-emerald-900 shadow-md"><b>Análise Jurídica:</b><br><br>${data.text}</div>`;
                 } else {
-                    throw new Error(data.error || "A IA não conseguiu processar este caso.");
+                    throw new Error(data.details || data.error || "A IA não conseguiu gerar uma resposta.");
                 }
             } catch (error) {
-                if(document.getElementById(loaderId)) document.getElementById(loaderId).remove();
-                chatBox.innerHTML += `<div class="ai-msg p-4 text-sm text-red-700 bg-red-50 border-red-500"><b>Erro no Sistema:</b> ${error.message}</div>`;
+                const loaderElem = document.getElementById(loaderId);
+                if(loaderElem) loaderElem.remove();
+                chatBox.innerHTML += `<div class="ai-msg p-4 text-sm text-red-700 bg-red-50 border-red-500"><b>Aviso:</b> ${error.message}</div>`;
             } finally {
                 btn.disabled = false;
                 btn.innerText = "ANALISAR";
@@ -154,9 +121,11 @@
 
         document.getElementById('send-btn').addEventListener('click', sendMessage);
         document.getElementById('user-input').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+            if (e.key === 'Enter' && !e.shiftKey) { 
+                e.preventDefault(); 
+                sendMessage(); 
+            }
         });
     </script>
 </body>
 </html>
-
