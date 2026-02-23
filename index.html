@@ -2,89 +2,45 @@
 <html lang="pt-pt">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JurisTutor MZ 🇲🇿</title>
+    <title>Manual do Utilizador - JurisTutor MZ</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .glass { background: rgba(255, 255, 255, 0.98); }
-        body { background: #0f172a; min-height: 100vh; font-family: 'Inter', sans-serif; }
-        .user-msg { background: #e2e8f0; align-self: flex-end; border-radius: 15px 15px 0 15px; color: #1e293b; }
-        .ai-msg { background: #ffffff; align-self: flex-start; border-radius: 0 15px 15px 15px; border-left: 5px solid #065f46; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-    </style>
 </head>
-<body class="p-4 md:p-8 flex justify-center">
-    <div class="w-full max-w-4xl glass rounded-2xl shadow-2xl flex flex-col h-[90vh]">
-        <div class="bg-emerald-900 p-5 text-white flex justify-between items-center rounded-t-2xl">
-            <div>
-                <h1 class="text-xl font-bold text-yellow-400 uppercase tracking-wider">JurisTutor Moçambique</h1>
-                <p class="text-xs text-emerald-200">Especialista em Legislação e Jurisprudência Nacional</p>
-            </div>
-            <span class="text-3xl">⚖️</span>
-        </div>
+<body class="bg-slate-100 p-6">
+    <div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-lg border-t-8 border-emerald-800">
+        <h1 class="text-2xl font-bold text-emerald-900 mb-4">Manual de Boas Práticas - JurisTutor</h1>
         
-        <div id="chat-box" class="flex-1 overflow-y-auto p-6 space-y-6 flex flex-col bg-slate-50">
-            <div class="ai-msg p-4 text-sm max-w-[90%]">
-                Saudações. Sou o seu assistente jurídico. <br><br>
-                <b>Introduza os factos do seu caso prático</b> para uma análise detalhada com base na lei moçambicana.
-            </div>
-        </div>
+        <section class="mb-6">
+            <h2 class="text-lg font-semibold text-emerald-700">1. Como Formular Casos Práticos</h2>
+            <p class="text-sm text-slate-600 mb-2">Para obter respostas com rigor acadêmico, estrutue a sua pergunta assim:</p>
+            <ul class="list-disc ml-5 text-sm space-y-1">
+                <li><b>Identifique as Partes:</b> (Ex: Empregador vs Trabalhador).</li>
+                <li><b>Factos Cronológicos:</b> Indique datas ou tempos de serviço.</li>
+                <li><b>O Pedido:</b> Seja específico sobre o que pretende saber (Ilicitude, Indemnização, Prazo).</li>
+            </ul>
+        </section>
 
-        <div class="p-4 bg-white border-t rounded-b-2xl">
-            <div class="flex gap-3">
-                <textarea id="user-input" class="flex-1 p-4 border-2 border-slate-200 rounded-xl outline-none text-sm focus:border-emerald-600 transition-all" placeholder="Ex: Um trabalhador foi despedido sem justa causa após 5 anos..." rows="2"></textarea>
-                <button id="send-btn" class="bg-emerald-700 hover:bg-emerald-800 text-white px-8 py-2 rounded-xl font-bold transition-colors shadow-lg self-end">ANALISAR</button>
+        <section class="mb-6">
+            <h2 class="text-lg font-semibold text-emerald-700">2. Legislação de Referência</h2>
+            <p class="text-sm text-slate-600 mb-2">O JurisTutor prioriza as atualizações mais recentes:</p>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="p-3 bg-emerald-50 rounded border border-emerald-200 text-xs">
+                    <b>Lei do Trabalho:</b> Lei n.º 13/2023 (Atualizada)
+                </div>
+                <div class="p-3 bg-emerald-50 rounded border border-emerald-200 text-xs">
+                    <b>Código Penal:</b> Lei n.º 24/2019
+                </div>
+                <div class="p-3 bg-emerald-50 rounded border border-emerald-200 text-xs">
+                    <b>Constituição:</b> CRM 2004 (Rev. 2018)
+                </div>
+                <div class="p-3 bg-emerald-50 rounded border border-emerald-200 text-xs">
+                    <b>Código Civil:</b> Decreto-Lei 47344
+                </div>
             </div>
+        </section>
+
+        <div class="bg-yellow-50 p-4 border-l-4 border-yellow-400 text-xs text-yellow-800 italic">
+            <b>Nota Acadêmica:</b> Esta ferramenta é um assistente de estudo. Todas as respostas devem ser validadas com a consulta direta ao Boletim da República.
         </div>
     </div>
-
-    <script>
-        async function sendMessage() {
-            const inputField = document.getElementById('user-input');
-            const chatBox = document.getElementById('chat-box');
-            const btn = document.getElementById('send-btn');
-            const text = inputField.value.trim();
-            if (!text || btn.disabled) return;
-
-            // Interface do Usuário
-            chatBox.innerHTML += `<div class="user-msg p-4 text-sm max-w-[85%] ml-auto shadow-sm"><b>Caso:</b><br>${text}</div>`;
-            inputField.value = "";
-            btn.disabled = true;
-            btn.innerText = "...";
-
-            // Indicador de Carregamento
-            const loaderId = "loader-" + Date.now();
-            chatBox.innerHTML += `<div id="${loaderId}" class="ai-msg p-4 text-sm italic text-slate-500 animate-pulse">Consultando legislação e jurisprudência...</div>`;
-            chatBox.scrollTop = chatBox.scrollHeight;
-
-            try {
-                const response = await fetch('/api/analisar', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt: text })
-                });
-
-                const data = await response.json();
-                document.getElementById(loaderId).remove();
-
-                if (data.text) {
-                    chatBox.innerHTML += `<div class="ai-msg p-5 text-sm max-w-[95%] whitespace-pre-line leading-relaxed text-slate-800">${data.text}</div>`;
-                } else {
-                    throw new Error(data.error || "Falha na análise");
-                }
-            } catch (error) {
-                if(document.getElementById(loaderId)) document.getElementById(loaderId).remove();
-                chatBox.innerHTML += `<div class="ai-msg p-4 text-sm text-red-700 bg-red-50 border-red-500"><b>Erro:</b> ${error.message}</div>`;
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "ANALISAR";
-                chatBox.scrollTop = chatBox.scrollHeight;
-            }
-        }
-
-        document.getElementById('send-btn').addEventListener('click', sendMessage);
-        document.getElementById('user-input').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
-        });
-    </script>
 </body>
 </html>
