@@ -11,29 +11,28 @@ export default async function handler(req, res) {
         const apiKey = process.env.GEMINI_API_KEY;
         if (!apiKey) return res.status(500).json({ error: "Chave API não configurada." });
 
-        // Inicializa a Google AI
+        // Inicializamos a API sem especificar a versão no construtor para evitar o 404
         const genAI = new GoogleGenerativeAI(apiKey);
         
-        // Versão estável do modelo para evitar o erro 404
+        // Selecionamos o modelo. O SDK usará a rota estável v1 por padrão.
         const model = genAI.getGenerativeModel({ 
             model: "gemini-1.5-flash",
-            systemInstruction: "Você é o JurisTutor Moçambique. Responda apenas sobre Direito de Moçambique, citando leis reais (CRM, Código Civil, Lei 13/2023). Não invente caminhos de ficheiros."
+            systemInstruction: "Você é o JurisTutor Moçambique. Responda apenas sobre Direito de Moçambique. Use a CRM 2018, Código Civil e a Lei 13/2023. Não invente links ou ficheiros."
         });
 
         const { prompt } = req.body;
         if (!prompt) return res.status(400).json({ error: "Prompt vazio." });
 
-        // Gerar conteúdo com tratamento de erro específico
+        // Chamada direta para o modelo estável
         const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const text = response.text();
+        const text = result.response.text();
 
         return res.status(200).json({ text });
         
     } catch (error) {
         console.error("Erro na API Gemini:", error);
         return res.status(500).json({ 
-            error: "Erro na conexão com a IA", 
+            error: "Erro de Conexão", 
             details: error.message 
         });
     }
