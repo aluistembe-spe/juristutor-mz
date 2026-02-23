@@ -9,50 +9,45 @@ export default async function handler(req, res) {
 
     try {
         const apiKey = process.env.GEMINI_API_KEY;
-        if (!apiKey) {
-            return res.status(500).json({ error: "ERRO: GEMINI_API_KEY não configurada na Vercel." });
-        }
+        if (!apiKey) return res.status(500).json({ error: "Configuração ausente: GEMINI_API_KEY." });
 
         const genAI = new GoogleGenerativeAI(apiKey);
         
-        // Configuração do "Cérebro" Jurídico Moçambicano
         const model = genAI.getGenerativeModel({ 
             model: "gemini-1.5-flash",
-            systemInstruction: `Você é o JurisTutor Moçambique, uma IA especializada exclusivamente no Ordenamento Jurídico Moçambicano. 
-
-            SUAS REGRAS DE OURO:
-            1. FUNDAMENTAÇÃO: Use sempre a CRM (2018), Código Civil, Código Penal (2019) e a NOVA Lei do Trabalho (Lei 13/2023).
-            2. CASOS PRÁTICOS: Para casos práticos, use o método SILP (Situação, Institutos, Lei, Parecer).
-            3. JURISPRUDÊNCIA: Mencione sempre que possível entendimentos do Tribunal Supremo e do Conselho Constitucional de Moçambique.
-            4. LACUNAS: Se houver lacuna na lei, fundamente com base no Artigo 10 do Código Civil (Integração de lacunas).
-            5. PROIBIÇÃO: Não use leis de Portugal ou Brasil. Se o utilizador perguntar algo fora do contexto de Moçambique, redirecione-o para a lei nacional.
+            systemInstruction: `Você é o JurisTutor Moçambique.
             
-            ESTRUTURA DE RESPOSTA:
-            - Enquadramento Legal (Artigos específicos).
-            - Análise Doutrinária/Jurisprudencial.
-            - Conclusão Prática Sugerida.`,
+            MISSÃO: Fornecer respostas jurídicas baseadas estritamente no ordenamento moçambicano vigente.
+            
+            REGRAS DE CONTEÚDO:
+            1. NÃO invente caminhos de ficheiros ou links locais (ex: C:/leis/...).
+            2. BASEIE-SE no conteúdo real das leis: CRM, Lei 13/2023 (Trabalho), Código Penal 2019, Código Civil, etc.
+            3. JURISPRUDÊNCIA: Cite a orientação dos Tribunais Superiores de Moçambique (Supremo e Constitucional).
+            4. PRECISÃO: Se o tema for novo (como a Lei 13/2023), garanta que a resposta reflete as mudanças atuais em relação à lei de 2007.
+            5. LACUNAS: Use o Artigo 10 do Código Civil para fundamentar a integração de lacunas.
+            
+            ESTRUTURA:
+            - Indicação da norma e artigos.
+            - Resposta fundamentada ao caso.
+            - Citação de jurisprudência/doutrina nacional se aplicável.`,
             generationConfig: {
-                temperature: 0.2, // Mantém a resposta técnica e evita "alucinações"
+                temperature: 0.1, // Máximo rigor, mínima "criatividade".
                 topP: 0.95,
             }
         });
 
         const { prompt } = req.body;
-        if (!prompt) return res.status(400).json({ error: "O prompt está vazio." });
+        if (!prompt) return res.status(400).json({ error: "Prompt vazio." });
 
-        // Adiciona um reforço no prompt do usuário para garantir o foco em MZ
-        const promptReforcado = `Analise tecnicamente segundo o Direito de Moçambique: ${prompt}`;
+        // Força a busca interna por legislação moçambicana real
+        const promptFinal = `Utilizando a legislação e jurisprudência real de Moçambique disponível online e em bases de dados jurídicas, responda: ${prompt}`;
 
-        const result = await model.generateContent(promptReforcado);
+        const result = await model.generateContent(promptFinal);
         const text = result.response.text();
 
         return res.status(200).json({ text });
         
     } catch (error) {
-        console.error("Erro Interno JurisTutor:", error.message);
-        return res.status(500).json({ 
-            error: "Erro na análise jurídica", 
-            details: error.message 
-        });
+        return res.status(500).json({ error: "Erro na análise", details: error.message });
     }
 }
