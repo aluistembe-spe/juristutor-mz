@@ -1,3 +1,12 @@
-body {
-  font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+{
+  "name": "juristutor-mz",
+  "version": "1.0.0",
+  "description": "Analisador jurídico moçambicano",
+  "main": "index.html",
+  "scripts": {
+    "start": "serve"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0"
+  }
 }
