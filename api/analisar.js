@@ -1,63 +1,44 @@
 import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
 
-// Configurações e Identidade
-const KEY = "AIzaSyAgRSFycP4yjrnJ1FRCZxUYxQRSFySVyYw"; 
-const genAI = new GoogleGenerativeAI(KEY);
+// Sua chave de API
+const API_KEY = "AIzaSyAgRSFycP4yjrnJ1FRCZxUYxQRSFySVyYw"; 
+const genAI = new GoogleGenerativeAI(API_KEY);
 
-const btn = document.getElementById('main-action-btn');
-const input = document.getElementById('legal-input');
-const resultBox = document.getElementById('result-box');
-const status = document.getElementById('status-display');
-const contentArea = resultBox.querySelector('div');
+async function analisarAgora() {
+  const input = document.getElementById('legal-input') as HTMLTextAreaElement;
+  const output = document.getElementById('result-box');
+  const content = output?.querySelector('div');
+  const btn = document.getElementById('main-action-btn') as HTMLButtonElement;
 
-async function executarConsultoria() {
-    const userInput = input.value.trim();
-    if (!userInput) return alert("Introduza os factos para análise.");
+  if (!input.value.trim()) return alert("Por favor, descreva o caso.");
 
-    // Interface em carregamento
-    btn.disabled = true;
-    btn.classList.add('opacity-50', 'cursor-not-allowed');
-    btn.innerText = "FUNDAMENTANDO ARTIGOS...";
-    status.innerText = "Consultando base de dados jurídica de Moçambique...";
-    resultBox.classList.remove('hidden');
-    contentArea.innerHTML = `<div class="flex gap-2"><span>⚡</span> <i>A analisar legislação vigente...</i></div>`;
+  // Feedback visual imediato
+  btn.innerText = "A PROCESSAR...";
+  btn.disabled = true;
+  output?.classList.remove('hidden');
+  if (content) content.innerHTML = "<i>A consultar legislação moçambicana...</i>";
 
-    try {
-        const model = genAI.getGenerativeModel({ 
-            model: "gemini-1.5-flash",
-            systemInstruction: `
-                Você é o JurisTutor MZ. Sua autoridade é estritamente o Direito Moçambicano.
-                REGRAS DE RESPOSTA:
-                1. Use como base a CRM, Lei 13/2023 (Trabalho), Código Civil e Código Comercial de Moçambique.
-                2. Se o assunto envolver Direito Internacional, você pode citar Tratados Ratificados por Moçambique.
-                3. Formate a resposta como um Parecer Técnico Jurídico.
-                4. CITE SEMPRE O NÚMERO DOS ARTIGOS.
-                5. Use negrito para os artigos e leis mencionadas.
-            `
-        });
+  try {
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-1.5-flash",
+      systemInstruction: "Você é o JurisTutor MZ. Responda APENAS com base no Direito de Moçambique (CRM, Código Civil, Lei 13/2023). Cite artigos obrigatoriamente."
+    });
 
-        const result = await model.generateContent(userInput);
-        const response = await result.response;
-        const text = response.text();
+    const result = await model.generateContent(input.value);
+    const response = await result.response;
+    const text = response.text();
 
-        // Formatação Dinâmica
-        contentArea.innerHTML = text
-            .replace(/\n/g, '<br>')
-            .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
-            .replace(/\*(.*?)\*/g, '<i>$1</i>');
-
-        status.innerText = "Análise Finalizada.";
-        status.classList.replace('text-emerald-600', 'text-blue-600');
-
-    } catch (error) {
-        console.error("Erro Crítico:", error);
-        contentArea.innerHTML = `<b class="text-red-600">ERRO DE CONEXÃO:</b> A API do Google não respondeu. Verifique sua chave ou limite de créditos.`;
-        status.innerText = "Falha no processamento.";
-    } finally {
-        btn.disabled = false;
-        btn.classList.remove('opacity-50', 'cursor-not-allowed');
-        btn.innerText = "Gerar Parecer Jurídico";
+    if (content) {
+      content.innerHTML = text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
     }
+  } catch (error: any) {
+    console.error(error);
+    if (content) content.innerHTML = "<b class='text-red-600'>Erro:</b> A API do Google rejeitou a chamada. Verifique se a sua chave ainda é válida no Google AI Studio.";
+  } finally {
+    btn.innerText = "Gerar Parecer Jurídico";
+    btn.disabled = false;
+  }
 }
 
-btn.addEventListener('click', executarConsultoria);
+// Garante que o botão funciona mesmo se o CodePen recarregar
+document.getElementById('main-action-btn')?.addEventListener('click', analisarAgora);
