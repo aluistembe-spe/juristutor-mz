@@ -1,18 +1,18 @@
 import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
 
-// Sua chave de API
+// Chave de API fornecida
 const API_KEY = "AIzaSyAgRSFycP4yjrnJ1FRCZxUYxQRSFySVyYw"; 
 const genAI = new GoogleGenerativeAI(API_KEY);
 
 async function analisarAgora() {
-  const input = document.getElementById('legal-input') as HTMLTextAreaElement;
+  const input = document.getElementById('legal-input');
   const output = document.getElementById('result-box');
   const content = output?.querySelector('div');
-  const btn = document.getElementById('main-action-btn') as HTMLButtonElement;
+  const btn = document.getElementById('main-action-btn');
 
   if (!input.value.trim()) return alert("Por favor, descreva o caso.");
 
-  // Feedback visual imediato
+  // Feedback visual
   btn.innerText = "A PROCESSAR...";
   btn.disabled = true;
   output?.classList.remove('hidden');
@@ -21,7 +21,7 @@ async function analisarAgora() {
   try {
     const model = genAI.getGenerativeModel({ 
       model: "gemini-1.5-flash",
-      systemInstruction: "Você é o JurisTutor MZ. Responda APENAS com base no Direito de Moçambique (CRM, Código Civil, Lei 13/2023). Cite artigos obrigatoriamente."
+      systemInstruction: "Você é o JurisTutor MZ. Responda com base no Direito de Moçambique (CRM, Código Civil, Lei 13/2023). Permita respostas sobre Direito Internacional apenas quando houver relações ou implicações diretas com Moçambique. Cite artigos obrigatoriamente."
     });
 
     const result = await model.generateContent(input.value);
@@ -31,14 +31,14 @@ async function analisarAgora() {
     if (content) {
       content.innerHTML = text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
     }
-  } catch (error: any) {
+  } catch (error) {
     console.error(error);
-    if (content) content.innerHTML = "<b class='text-red-600'>Erro:</b> A API do Google rejeitou a chamada. Verifique se a sua chave ainda é válida no Google AI Studio.";
+    if (content) content.innerHTML = "<b class='text-red-600'>Erro:</b> Falha na comunicação com a inteligência artificial. Verifique sua conexão ou chave de acesso.";
   } finally {
     btn.innerText = "Gerar Parecer Jurídico";
     btn.disabled = false;
   }
 }
 
-// Garante que o botão funciona mesmo se o CodePen recarregar
+// Inicialização do evento
 document.getElementById('main-action-btn')?.addEventListener('click', analisarAgora);
