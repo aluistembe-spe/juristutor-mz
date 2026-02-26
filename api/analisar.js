@@ -42,3 +42,13 @@ async function analisarAgora() {
 
 // Inicialização do evento
 document.getElementById('main-action-btn')?.addEventListener('click', analisarAgora);
+// No final do seu script.js, use isto:
+window.addEventListener('load', () => {
+    const btn = document.getElementById('main-action-btn');
+    if (btn) {
+        btn.onclick = analisarAgora;
+        console.log("Botão JurisTutor ativado com sucesso!");
+    } else {
+        console.error("Erro: Botão não encontrado no HTML.");
+    }
+});
