@@ -9,10 +9,12 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Campo 'texto' inválido ou ausente" });
     }
 
+    // Exemplo de processamento simples
     const resultado = texto.replace(/\s+/g, " ").trim();
-    return res.status(200).json({ resultado }); // ✅ sempre JSON
-  } catch (error) {
-    console.error("Erro detalhado:", error);
-    return res.status(500).json({ error: "Erro interno do servidor" }); // ✅ sempre JSON
+
+    return res.status(200).json({ resultado });
+  } catch (err) {
+    console.error("Erro no analisar.js:", err);
+    return res.status(500).json({ error: "Erro interno do servidor" });
   }
 }
