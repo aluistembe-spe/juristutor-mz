@@ -1,3 +1,4 @@
+// api/analisar.js
 export default async function handler(req, res) {
   try {
     if (req.method !== "POST") {
@@ -9,12 +10,10 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Campo 'texto' inválido ou ausente" });
     }
 
-    // Exemplo de processamento simples
     const resultado = texto.replace(/\s+/g, " ").trim();
-
     return res.status(200).json({ resultado });
-  } catch (err) {
-    console.error("Erro no analisar.js:", err);
+  } catch (error) {
+    console.error("Erro detalhado:", error);
     return res.status(500).json({ error: "Erro interno do servidor" });
   }
 }
