@@ -1,3 +1,3 @@
-git add .
-git commit -m "Corrige rota API analisar.js para Vercel"
-git push origin main
+curl -X POST https://juristutor-mz.vercel.app/api/analisar \
+  -H "Content-Type: application/json" \
+  -d '{"texto":"teste"}'
