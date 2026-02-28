@@ -51,3 +51,4 @@ window.addEventListener('DOMContentLoaded', () => {
     console.log("JurisTutor: Botão configurado com sucesso.");
   }
 });
+
