@@ -3,6 +3,5 @@
   "builds": [
     { "src": "api/*.js", "use": "@vercel/node" },
     { "src": "index.html", "use": "@vercel/static" }
-    https://juristutor-mz.vercel.app/api/analisar
   ]
 }
