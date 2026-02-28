@@ -1,8 +1,7 @@
 {
-  "crons": [
-    {
-      "path": "/api/analisar",
-      "schedule": "0 8 * * *"
-    }
+  "version": 2,
+  "builds": [
+    { "src": "api/*.js", "use": "@vercel/node" },
+    { "src": "index.html", "use": "@vercel/static" }
   ]
 }
