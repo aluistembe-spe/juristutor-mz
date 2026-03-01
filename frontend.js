@@ -1,27 +1,72 @@
-document.getElementById("btnAnalisar").addEventListener("click", async () => {
+const entrada = document.getElementById("entrada");
+const contador = document.getElementById("contador-caracteres");
+const btn = document.getElementById("btnAnalisar");
+const btnLabel = document.getElementById("btnLabel");
+const btnSpinner = document.getElementById("btnSpinner");
+const resultado = document.getElementById("resultado");
+const mensagemErro = document.getElementById("mensagem-erro");
+const tipoSelect = document.getElementById("tipo-documento");
+
+const MAX_CHARS = 4000;
+
+entrada.addEventListener("input", () => {
+  const length = entrada.value.length;
+  contador.textContent = `${length} caractere${length === 1 ? "" : "s"}`;
+
+  if (length > MAX_CHARS) {
+    mensagemErro.textContent = `Limite de ${MAX_CHARS} caracteres ultrapassado. Resuma o texto.`;
+    mensagemErro.classList.remove("hidden");
+  } else {
+    mensagemErro.classList.add("hidden");
+  }
+});
+
+async function analisar() {
+  const texto = entrada.value.trim();
+  const tipo = tipoSelect.value;
+
+  if (!texto) {
+    mensagemErro.textContent = "Por favor, insira um texto para análise.";
+    mensagemErro.classList.remove("hidden");
+    return;
+  }
+
+  if (texto.length > MAX_CHARS) {
+    mensagemErro.textContent = `Limite de ${MAX_CHARS} caracteres ultrapassado. Resuma o texto.`;
+    mensagemErro.classList.remove("hidden");
+    return;
+  }
+
+  mensagemErro.classList.add("hidden");
+  btn.disabled = true;
+  btnLabel.textContent = "Analisando...";
+  btnSpinner.classList.remove("hidden");
+
   try {
-    const texto = document.getElementById("entrada").value.trim();
-
-    if (!texto) {
-      document.getElementById("resultado").innerText = "Por favor, insira um texto.";
-      return;
-    }
-
     const response = await fetch("/api/analisar", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ texto })
+      body: JSON.stringify({ texto, tipo }),
     });
 
     const data = await response.json();
 
     if (response.ok) {
-      document.getElementById("resultado").innerText = data.resultado;
+      resultado.textContent = data.resultado;
     } else {
-      document.getElementById("resultado").innerText = `Erro: ${data.error}`;
+      resultado.textContent = `Erro: ${data.error || "não foi possível analisar o texto."}`;
     }
   } catch (err) {
     console.error("Erro no frontend:", err);
-    document.getElementById("resultado").innerText = "Erro inesperado no cliente.";
+    resultado.textContent = "Erro inesperado no cliente. Verifique a ligação à internet e tente novamente.";
+  } finally {
+    btn.disabled = false;
+    btnLabel.textContent = "Analisar agora";
+    btnSpinner.classList.add("hidden");
   }
+}
+
+btn.addEventListener("click", (e) => {
+  e.preventDefault();
+  analisar();
 });
