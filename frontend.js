@@ -7,6 +7,11 @@ const resultado = document.getElementById("resultado");
 const mensagemErro = document.getElementById("mensagem-erro");
 const tipoSelect = document.getElementById("tipo-documento");
 const btnCopiar = document.getElementById("btnCopiar");
+const btnReportar = document.getElementById("btnReportar");
+const modalErro = document.getElementById("modal-erro");
+const inputReport = document.getElementById("input-report");
+const btnCancelarReport = document.getElementById("btnCancelarReport");
+const btnEnviarReport = document.getElementById("btnEnviarReport");
 
 const MAX_CHARS = 4000;
 
@@ -98,6 +103,56 @@ if (btnCopiar) {
     } catch (err) {
       console.error("Erro ao copiar análise:", err);
       window.alert("Não foi possível copiar a análise.");
+    }
+  });
+}
+
+if (btnReportar && modalErro && inputReport && btnCancelarReport && btnEnviarReport) {
+  const openModal = () => {
+    const texto = (resultado.textContent || "").trim();
+    if (!texto) {
+      window.alert("Não há análise para reportar ainda.");
+      return;
+    }
+    inputReport.value = "";
+    modalErro.classList.remove("hidden");
+  };
+
+  const closeModal = () => {
+    modalErro.classList.add("hidden");
+  };
+
+  btnReportar.addEventListener("click", openModal);
+  btnCancelarReport.addEventListener("click", closeModal);
+
+  btnEnviarReport.addEventListener("click", async () => {
+    const comentario = inputReport.value.trim();
+    if (!comentario) {
+      window.alert("Por favor, descreva o erro jurídico antes de enviar.");
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/report-erro", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          comentario,
+          analise: (resultado.textContent || "").trim(),
+          pergunta: entrada.value.trim(),
+          areaSelecionada: tipoSelect.value,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Falha ao enviar relatório");
+      }
+
+      closeModal();
+      window.alert("Relatório enviado para revisão jurídica. Obrigado pela ajuda!");
+    } catch (err) {
+      console.error("Erro ao enviar relatório:", err);
+      window.alert("Não foi possível enviar o relatório. Tente novamente mais tarde.");
     }
   });
 }
