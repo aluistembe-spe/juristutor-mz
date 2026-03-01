@@ -6,6 +6,7 @@ const btnSpinner = document.getElementById("btnSpinner");
 const resultado = document.getElementById("resultado");
 const mensagemErro = document.getElementById("mensagem-erro");
 const tipoSelect = document.getElementById("tipo-documento");
+const btnCopiar = document.getElementById("btnCopiar");
 
 const MAX_CHARS = 4000;
 
@@ -70,3 +71,33 @@ btn.addEventListener("click", (e) => {
   e.preventDefault();
   analisar();
 });
+
+if (btnCopiar) {
+  btnCopiar.addEventListener("click", async () => {
+    const texto = (resultado.textContent || "").trim();
+    if (!texto) {
+      window.alert("Não há análise para copiar ainda.");
+      return;
+    }
+
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(texto);
+      } else {
+        const area = document.createElement("textarea");
+        area.value = texto;
+        area.style.position = "fixed";
+        area.style.left = "-9999px";
+        document.body.appendChild(area);
+        area.focus();
+        area.select();
+        document.execCommand("copy");
+        document.body.removeChild(area);
+      }
+      window.alert("Análise copiada para a área de transferência.");
+    } catch (err) {
+      console.error("Erro ao copiar análise:", err);
+      window.alert("Não foi possível copiar a análise.");
+    }
+  });
+}
