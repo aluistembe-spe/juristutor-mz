@@ -68,7 +68,7 @@
         </div>
       </section>
 
-      <section class="mt-6 border-t border-slate-800 pt-5">
+      <section class="mt-6 border-t border-slate-800 pt-5 space-y-3">
         <h2 class="text-sm font-semibold text-slate-200 mb-2">
           Resultado (legislação moçambicana)
         </h2>
@@ -78,12 +78,31 @@
         >
           Cole um texto acima e escolha a área da lei para ver alertas e próximos passos com base na legislação de Moçambique.
         </div>
-        <div class="mt-3 flex flex-wrap gap-2 justify-end text-xs text-slate-400">
-          <button id="btnCopiar" class="secondary-button">
-            Copiar análise
+        <div class="flex flex-wrap gap-2 justify-between items-center text-xs text-slate-400">
+          <button id="btnReportar" class="secondary-button secondary-button-danger">
+            Comunicar erro jurídico
           </button>
+          <div class="flex gap-2">
+            <button id="btnCopiar" class="secondary-button">
+              Copiar análise
+            </button>
+          </div>
         </div>
       </section>
+
+      <div id="modal-erro" class="modal-backdrop hidden">
+        <div class="modal">
+          <h2 class="modal-title">Comunicar erro jurídico</h2>
+          <p class="modal-text">
+            Descreva o que está errado (artigo, interpretação, diploma, etc.). A informação será enviada para revisão humana.
+          </p>
+          <textarea id="input-report" class="input modal-textarea" rows="4" placeholder="Ex.: A resposta indicou Lei 23/2007, mas o artigo correcto é..."></textarea>
+          <div class="modal-actions">
+            <button id="btnCancelarReport" class="secondary-button">Cancelar</button>
+            <button id="btnEnviarReport" class="primary-button">Enviar relatório</button>
+          </div>
+        </div>
+      </div>
     </main>
   </div>
 
