@@ -3,6 +3,86 @@
  * Referências: Lei 23/2007 (Código do Trabalho), Lei 22/2019 (Lei da Família),
  * Lei 19/1997 (Lei de Terras), DUAT, usos e costumes locais.
  */
+function inferirAreaDaLei(lower) {
+  const has = (w) => lower.includes(w);
+
+  if (
+    has("despedimento") ||
+    has("despedir") ||
+    has("contrato de trabalho") ||
+    has("salário") ||
+    has("salario")
+  ) {
+    return "laboral";
+  }
+
+  if (
+    has("casamento") ||
+    has("união de facto") ||
+    has("uniao de facto") ||
+    has("herança") ||
+    has("heranca") ||
+    has("sucessão") ||
+    has("sucessao")
+  ) {
+    return "familia";
+  }
+
+  if (has("duat") || has("terra") || has("terras") || has("parcela") || has("concessão") || has("concessao")) {
+    return "terra";
+  }
+
+  if (
+    has("crime") ||
+    has("pena") ||
+    has("prisão") ||
+    has("prisao") ||
+    has("homicídio") ||
+    has("homicidio") ||
+    has("furto")
+  ) {
+    return "penal";
+  }
+
+  if (has("processo penal") || has("acusação") || has("acusacao") || has("instrução") || has("instrucao")) {
+    return "processo_penal";
+  }
+
+  if (has("processo civil") || has("petição inicial") || has("peticao inicial") || has("execução") || has("execucao")) {
+    return "processo_civil";
+  }
+
+  if (
+    has("constituição") ||
+    has("constituicao") ||
+    has("direitos fundamentais") ||
+    has("direitos humanos") ||
+    has("liberdades") ||
+    has("tribunal constitucional")
+  ) {
+    return "constitucional";
+  }
+
+  if (
+    has("acto administrativo") ||
+    has("ato administrativo") ||
+    has("licença") ||
+    has("licenca") ||
+    has("alvará") ||
+    has("alvara") ||
+    has("concurso público") ||
+    has("concurso publico")
+  ) {
+    return "administrativo";
+  }
+
+  if (has("contrato")) {
+    return "contrato";
+  }
+
+  return "outro";
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Método não permitido" });
@@ -18,6 +98,10 @@ export default async function handler(req, res) {
     const cleaned = texto.replace(/\s+/g, " ").trim();
     const lower = cleaned.toLowerCase();
 
+    const isPergunta =
+      cleaned.includes("?") ||
+      /^o que|^qual|^quais|^como|^quando|^por que|^porque/i.test(cleaned.trim());
+
     const palavras = cleaned.split(/\s+/).filter(Boolean);
     const nPalavras = palavras.length;
     const nCaracteres = cleaned.length;
@@ -28,7 +112,9 @@ export default async function handler(req, res) {
     const alertas = [];
     const sugestoesGerais = [];
 
-    switch (tipo) {
+    const area = !tipo || tipo === "outro" ? inferirAreaDaLei(lower) : tipo;
+
+    switch (area) {
       case "laboral": {
         // Lei 23/2007 – Código do Trabalho de Moçambique
         if (
@@ -142,6 +228,71 @@ export default async function handler(req, res) {
         );
         sugestoesGerais.push(
           "Avalie se as obrigações das partes estão equilibradas e se o contrato respeita a ordem pública de Moçambique."
+        );
+        break;
+      }
+
+      case "penal": {
+        if (lower.includes("prisão preventiva") || lower.includes("prisao preventiva")) {
+          alertas.push(
+            "A prisão preventiva em Moçambique é medida excepcional prevista no Código de Processo Penal, devendo respeitar os prazos e fundamentos legais."
+          );
+        }
+        if (lower.includes("homicídio") || lower.includes("homicidio")) {
+          alertas.push(
+            "O homicídio é crime grave previsto no Código Penal moçambicano, na parte dos crimes contra a vida."
+          );
+        }
+        if (lower.includes("furto") || lower.includes("roubo")) {
+          alertas.push(
+            "Crimes contra o património (furto, roubo, etc.) são regulados no Código Penal moçambicano, com penas que variam consoante a gravidade."
+          );
+        }
+        sugestoesGerais.push(
+          "Identifique qual o tipo de crime em causa (contra a vida, património, integridade física, etc.) e consulte a parte especial do Código Penal moçambicano."
+        );
+        sugestoesGerais.push(
+          "Avalie se estão reunidos os elementos típicos do crime (conduta, ilicitude, culpa) segundo a doutrina e jurisprudência moçambicanas."
+        );
+        break;
+      }
+
+      case "processo_penal": {
+        sugestoesGerais.push(
+          "Organize os factos pela sequência processual (denúncia, investigação, acusação, julgamento, recursos) à luz do Código de Processo Penal moçambicano."
+        );
+        sugestoesGerais.push(
+          "Verifique prazos de prisão preventiva, instrução e recursos previstos no CPP, garantindo respeito às garantias de defesa."
+        );
+        break;
+      }
+
+      case "processo_civil": {
+        sugestoesGerais.push(
+          "Identifique se o texto corresponde a petição inicial, contestação, recurso ou outro acto à luz do Código de Processo Civil moçambicano."
+        );
+        sugestoesGerais.push(
+          "Confirme requisitos formais (competência, valor, causa de pedir, pedido) exigidos pelo CPC para a peça processual em causa."
+        );
+        break;
+      }
+
+      case "constitucional": {
+        sugestoesGerais.push(
+          "Relacione o problema com os direitos, liberdades e garantias previstos na Constituição da República de Moçambique."
+        );
+        sugestoesGerais.push(
+          "Analise se há violação de princípios constitucionais como legalidade, igualdade, dignidade da pessoa humana ou acesso à justiça."
+        );
+        break;
+      }
+
+      case "administrativo": {
+        sugestoesGerais.push(
+          "Verifique se o acto administrativo observado respeita os princípios de legalidade, imparcialidade e transparência do direito administrativo moçambicano."
+        );
+        sugestoesGerais.push(
+          "Confirme prazos e meios de impugnação contenciosa junto do Tribunal Administrativo ou das autoridades hierarquicamente superiores."
         );
         break;
       }
