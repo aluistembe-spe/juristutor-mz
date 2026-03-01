@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "vercel dev",
-    "build": "tailwindcss -i ./src/styles.css -o ./dist/output.css",
+    "build": "tailwindcss -i ./src/style.css -o ./dist/output.css",
     "start": "serve ."
   },
   "dependencies": {},
