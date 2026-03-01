@@ -1,3 +1,35 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-slate-950 text-slate-50 antialiased;
+  }
+}
+
+@layer components {
+  .page-shell {
+    @apply min-h-screen flex items-center justify-center px-4;
+  }
+
+  .card {
+    @apply max-w-3xl w-full bg-slate-900/70 border border-slate-700 rounded-2xl shadow-2xl shadow-slate-900/60 backdrop-blur-md p-6 sm:p-8;
+  }
+
+  .primary-button {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg bg-primary-500 hover:bg-primary-600 text-white font-semibold shadow-md shadow-primary-500/30 transition disabled:opacity-70 disabled:cursor-not-allowed;
+  }
+
+  .input {
+    @apply w-full rounded-xl border border-slate-700 bg-slate-900/60 px-3 py-2 text-sm sm:text-base text-slate-50 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500/80 focus:border-transparent resize-y;
+  }
+
+  .pill {
+    @apply inline-flex items-center gap-2 rounded-full bg-slate-800/80 px-3 py-1 text-xs font-medium text-slate-300;
+  }
+
+  .resultado-text {
+    @apply whitespace-pre-wrap;
+  }
+}
