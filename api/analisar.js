@@ -1,4 +1,3 @@
-// api/analisar.js
 export default async function handler(req, res) {
   try {
     if (req.method !== "POST") {
@@ -12,8 +11,8 @@ export default async function handler(req, res) {
 
     const resultado = texto.replace(/\s+/g, " ").trim();
     return res.status(200).json({ resultado });
-  } catch (error) {
-    console.error("Erro detalhado:", error);
+  } catch (err) {
+    console.error("Erro no analisar.js:", err);
     return res.status(500).json({ error: "Erro interno do servidor" });
   }
 }
