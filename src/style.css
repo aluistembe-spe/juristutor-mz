@@ -25,6 +25,10 @@
     @apply inline-flex items-center justify-center px-3 py-1.5 rounded-lg border border-slate-600 bg-slate-900/60 text-slate-200 hover:bg-slate-800/80 hover:border-slate-400 transition;
   }
 
+  .secondary-button-danger {
+    @apply border-rose-500/60 text-rose-300 hover:border-rose-400 hover:bg-rose-500/10;
+  }
+
   .input {
     @apply w-full rounded-xl border border-slate-700 bg-slate-900/60 px-3 py-2 text-sm sm:text-base text-slate-50 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500/80 focus:border-transparent resize-y;
   }
@@ -35,5 +39,29 @@
 
   .resultado-text {
     @apply whitespace-pre-wrap;
+  }
+
+  .modal-backdrop {
+    @apply fixed inset-0 bg-black/60 flex items-center justify-center z-50;
+  }
+
+  .modal {
+    @apply w-full max-w-lg bg-slate-900 border border-slate-700 rounded-2xl p-5 shadow-2xl shadow-black/70;
+  }
+
+  .modal-title {
+    @apply text-sm font-semibold text-slate-100 mb-2;
+  }
+
+  .modal-text {
+    @apply text-xs text-slate-300 mb-3;
+  }
+
+  .modal-textarea {
+    @apply text-xs;
+  }
+
+  .modal-actions {
+    @apply mt-4 flex justify-end gap-2;
   }
 }
