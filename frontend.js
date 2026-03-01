@@ -14,7 +14,7 @@ entrada.addEventListener("input", () => {
   contador.textContent = `${length} caractere${length === 1 ? "" : "s"}`;
 
   if (length > MAX_CHARS) {
-    mensagemErro.textContent = `Limite de ${MAX_CHARS} caracteres ultrapassado. Resuma o texto.`;
+    mensagemErro.textContent = `Limite de ${MAX_CHARS} caracteres. Resuma o texto.`;
     mensagemErro.classList.remove("hidden");
   } else {
     mensagemErro.classList.add("hidden");
@@ -32,7 +32,7 @@ async function analisar() {
   }
 
   if (texto.length > MAX_CHARS) {
-    mensagemErro.textContent = `Limite de ${MAX_CHARS} caracteres ultrapassado. Resuma o texto.`;
+    mensagemErro.textContent = `Limite de ${MAX_CHARS} caracteres. Resuma o texto.`;
     mensagemErro.classList.remove("hidden");
     return;
   }
@@ -54,14 +54,14 @@ async function analisar() {
     if (response.ok) {
       resultado.textContent = data.resultado;
     } else {
-      resultado.textContent = `Erro: ${data.error || "não foi possível analisar o texto."}`;
+      resultado.textContent = `Erro: ${data.error || "não foi possível analisar."}`;
     }
   } catch (err) {
     console.error("Erro no frontend:", err);
-    resultado.textContent = "Erro inesperado no cliente. Verifique a ligação à internet e tente novamente.";
+    resultado.textContent = "Erro inesperado. Verifique a ligação e tente novamente.";
   } finally {
     btn.disabled = false;
-    btnLabel.textContent = "Analisar agora";
+    btnLabel.textContent = "Analisar com base na lei MZ";
     btnSpinner.classList.add("hidden");
   }
 }
