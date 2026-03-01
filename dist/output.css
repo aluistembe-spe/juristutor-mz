@@ -1,1 +1,3 @@
-npx tailwindcss -i ./src/styles.css -o ./dist/output.css
+git add dist/output.css
+git commit -m "Build Tailwind CSS"
+git push
