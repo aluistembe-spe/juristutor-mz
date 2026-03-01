@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>JurisTutor MZ</title>
+  <title>JurisTutor MZ – Lei de Moçambique</title>
   <link rel="icon" href="/public/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="/dist/output.css" />
 </head>
@@ -16,25 +16,25 @@
             JurisTutor <span class="text-primary-400">MZ</span>
           </h1>
           <p class="mt-2 text-sm sm:text-base text-slate-300">
-            Analisador rápido de textos jurídicos moçambicanos para apoiar decisões no dia‑a‑dia.
+            Análise rápida de textos jurídicos com base <strong>exclusivamente</strong> na legislação moçambicana.
           </p>
         </div>
         <div class="pill">
           <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span>Funciona localmente • Sem IA externa</span>
+          <span>Lei de Moçambique • Sem IA externa</span>
         </div>
       </header>
 
       <section class="space-y-4">
         <div class="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
           <label class="text-sm font-medium text-slate-200" for="tipo-documento">
-            Tipo de problema
+            Área da lei moçambicana
           </label>
           <select id="tipo-documento" class="input sm:max-w-xs">
-            <option value="laboral">Direito do trabalho</option>
-            <option value="familia">Direito de família</option>
+            <option value="laboral">Código do Trabalho (Lei 23/2007)</option>
+            <option value="familia">Lei da Família (Lei 22/2019)</option>
+            <option value="terra">Lei de Terras / DUAT (Lei 19/1997)</option>
             <option value="contrato">Contratos em geral</option>
-            <option value="terra">Terra e propriedade</option>
             <option value="outro">Outro</option>
           </select>
         </div>
@@ -42,7 +42,7 @@
         <div class="space-y-2">
           <div class="flex items-center justify-between">
             <label for="entrada" class="text-sm font-medium text-slate-200">
-              Texto jurídico para análise
+              Texto para análise
             </label>
             <span id="contador-caracteres" class="text-xs text-slate-400">
               0 caracteres
@@ -52,14 +52,14 @@
             id="entrada"
             rows="6"
             class="input"
-            placeholder="Descreva o problema ou cole uma cláusula do contrato. Ex.: &quot;O trabalhador foi despedido sem aviso prévio nem indemnização...&quot;"
+            placeholder="Descreva o problema ou cole uma cláusula. Ex.: &quot;O trabalhador foi despedido sem aviso prévio...&quot; ou &quot;Questão de herança conforme usos e costumes...&quot;"
           ></textarea>
         </div>
 
         <div class="flex flex-wrap items-center gap-3 justify-between">
           <p id="mensagem-erro" class="text-sm text-rose-400 hidden"></p>
           <button id="btnAnalisar" class="primary-button">
-            <span id="btnLabel">Analisar agora</span>
+            <span id="btnLabel">Analisar com base na lei MZ</span>
             <span
               id="btnSpinner"
               class="ml-2 hidden h-4 w-4 border-2 border-white/40 border-t-transparent rounded-full animate-spin"
@@ -70,13 +70,13 @@
 
       <section class="mt-6 border-t border-slate-800 pt-5">
         <h2 class="text-sm font-semibold text-slate-200 mb-2">
-          Resultado da análise
+          Resultado (legislação moçambicana)
         </h2>
         <div
           id="resultado"
           class="resultado-text min-h-[4rem] rounded-xl border border-dashed border-slate-700 bg-slate-900/40 p-3 text-sm text-slate-300"
         >
-          Comece colando um texto acima para ver alertas, pontos fortes e próximos passos recomendados.
+          Cole um texto acima e escolha a área da lei para ver alertas e próximos passos com base na legislação de Moçambique.
         </div>
       </section>
     </main>
