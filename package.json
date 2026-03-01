@@ -6,6 +6,7 @@
     "build": "tailwindcss -i ./src/style.css -o ./dist/output.css",
     "start": "serve ."
   },
+  "dependencies": {},
   "devDependencies": {
     "tailwindcss": "^3.4.0",
     "postcss": "^8.4.0",
