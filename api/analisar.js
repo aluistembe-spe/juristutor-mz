@@ -102,12 +102,24 @@ module.exports = async (req, res) => {
             systemInstruction: SISTEMA_JURISTUTOR_MZ
         });
 
-        const { prompt } = req.body || {};
-        if (!prompt || typeof prompt !== "string" || !prompt.trim()) {
+        const body = req.body || {};
+
+        // Compatibilidade com duas interfaces:
+        // - interface chat: { prompt: "..." }
+        // - interface clássica: { texto: "...", tipo: "laboral|familia|..." }
+        let promptBruto = "";
+        if (typeof body.prompt === "string" && body.prompt.trim()) {
+            promptBruto = body.prompt.trim();
+        } else if (typeof body.texto === "string" && body.texto.trim()) {
+            const area = typeof body.tipo === "string" && body.tipo.trim() ? body.tipo.trim() : "não especificada";
+            promptBruto = `Texto apresentado para análise jurídica em Moçambique (área indicada: ${area}):\n\n${body.texto.trim()}\n\nTarefa: aplica exclusivamente a ordem jurídica moçambicana, seguindo o sistema do JurisTutor MZ.`;
+        }
+
+        if (!promptBruto) {
             return res.status(400).json({ error: "O campo de texto está vazio ou inválido." });
         }
 
-        const cleanedPrompt = prompt.trim();
+        const cleanedPrompt = promptBruto;
 
         const result = await model.generateContent(cleanedPrompt);
         const response = await result.response;
@@ -119,7 +131,8 @@ module.exports = async (req, res) => {
                 : "Não foi possível gerar uma análise jurídica neste momento.") +
             ASSINATURA_FIXA;
 
-        return res.status(200).json({ text: textoFinal });
+        // Retorna em ambos os campos para compatibilidade com UIs diferentes
+        return res.status(200).json({ text: textoFinal, resultado: textoFinal });
     } catch (error) {
         console.error("Erro na API:", error);
         return res.status(500).json({ error: "Erro interno", details: error.message });
