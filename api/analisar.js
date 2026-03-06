@@ -1,5 +1,3 @@
-const { GoogleGenerativeAI } = require("@google/generative-ai");
-
 const SISTEMA_JURISTUTOR_MZ = `
 Atua como **JurisTutor MZ**, uma IA de consultoria e estudo jurídico moçambicano de elite.
 
@@ -82,59 +80,71 @@ BIM (NIB): 1099450284
 `;
 
 module.exports = async (req, res) => {
-    // Configuração de CORS para permitir a comunicação com o index.html
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    // Configuração de CORS para permitir a comunicação com o index.html ou outros frontends
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-    if (req.method === 'OPTIONS') {
+    if (req.method === "OPTIONS") {
         return res.status(200).end();
     }
 
     if (!process.env.GEMINI_API_KEY) {
-        return res.status(500).json({ error: "Erro: GEMINI_API_KEY não configurada na Vercel." });
+        return res
+            .status(500)
+            .json({ error: "Erro: GEMINI_API_KEY não configurada na Vercel." });
     }
 
     try {
+        // Import dinâmico para funcionar em ambiente CommonJS (Serverless Vercel)
+        const { GoogleGenerativeAI } = await import("@google/generative-ai");
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ 
+        const model = genAI.getGenerativeModel({
             model: "gemini-1.5-flash",
-            systemInstruction: SISTEMA_JURISTUTOR_MZ
+            systemInstruction: SISTEMA_JURISTUTOR_MZ,
         });
 
         const body = req.body || {};
 
-        // Compatibilidade com duas interfaces:
-        // - interface chat: { prompt: "..." }
-        // - interface clássica: { texto: "...", tipo: "laboral|familia|..." }
+        // Compatibilidade com:
+        // - interface chat (index.html do repositório): { prompt: "..." }
+        // - interface formulário (versão com frontend.js): { texto: "...", tipo: "laboral|familia|..." }
         let promptBruto = "";
+
         if (typeof body.prompt === "string" && body.prompt.trim()) {
             promptBruto = body.prompt.trim();
         } else if (typeof body.texto === "string" && body.texto.trim()) {
-            const area = typeof body.tipo === "string" && body.tipo.trim() ? body.tipo.trim() : "não especificada";
+            const area =
+                typeof body.tipo === "string" && body.tipo.trim()
+                    ? body.tipo.trim()
+                    : "não especificada";
             promptBruto = `Texto apresentado para análise jurídica em Moçambique (área indicada: ${area}):\n\n${body.texto.trim()}\n\nTarefa: aplica exclusivamente a ordem jurídica moçambicana, seguindo o sistema do JurisTutor MZ.`;
         }
 
         if (!promptBruto) {
-            return res.status(400).json({ error: "O campo de texto está vazio ou inválido." });
+            return res
+                .status(400)
+                .json({ error: "O campo de texto está vazio ou inválido." });
         }
 
-        const cleanedPrompt = promptBruto;
-
-        const result = await model.generateContent(cleanedPrompt);
+        const result = await model.generateContent(promptBruto);
         const response = await result.response;
-        const textoModelo = typeof response?.text === "function" ? response.text() : "";
+        const textoModelo =
+            response && typeof response.text === "function" ? response.text() : "";
 
         const textoFinal =
             (textoModelo && textoModelo.trim().length > 0
                 ? textoModelo.trim()
                 : "Não foi possível gerar uma análise jurídica neste momento.") +
+            "\n\n" +
             ASSINATURA_FIXA;
 
-        // Retorna em ambos os campos para compatibilidade com UIs diferentes
+        // Retorna em ambos os campos para compatibilidade com diferentes UIs
         return res.status(200).json({ text: textoFinal, resultado: textoFinal });
     } catch (error) {
-        console.error("Erro na API:", error);
-        return res.status(500).json({ error: "Erro interno", details: error.message });
+        console.error("Erro na API /api/analisar:", error);
+        return res
+            .status(500)
+            .json({ error: "Erro interno", details: error.message || String(error) });
     }
 };
