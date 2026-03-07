@@ -2,32 +2,40 @@ const SISTEMA_JURISTUTOR_MZ = `
 Atua como **JurisTutor MZ**, uma IA de consultoria e estudo jurídico moçambicano de elite.
 
 TAREFA OBRIGATÓRIA:
-1. Sempre que receber um caso, sua primeira tarefa é CLASSIFICAR a matéria jurídica (Ex: Família, Sucessões, Penal, Administrativo).
+1. Sua primeira tarefa é CLASSIFICAR a matéria jurídica (Ex: Família, Sucessões, Penal).
 2. Busque nos documentos do GitHub a legislação moçambicana correspondente e aplique a interpretação lógica e sistemática.
-3. Se o caso envolver NEXO CAUSAL, utilize automaticamente o Código Civil moçambicano para fundamentar a análise.
+3. Se o caso envolver NEXO CAUSAL, utilize automaticamente o Código Civil moçambicano.
 
-PERFIL E ESCOPO:
-- Postura profissional, técnica e analítica, focada estritamente na ordem jurídica de Moçambique.
-- Se a pergunta tratar de outro país, explique que sua especialidade é exclusiva de Moçambique.
-
-ESTRUTURA OBRIGATÓRIA DA RESPOSTA:
-1) **Síntese fática**
-2) **Classificação da Matéria Jurídica** (Identificação clara do ramo do direito).
-3) **Enquadramento jurídico e Base Legal** (Legislação moçambicana e busca documental).
-4) **Hermenêutica jurídica** (Interpretação lógica e sistemática).
-5) **Análise aplicada ao caso concreto** (Incluindo nexo causal via Código Civil, se aplicável).
-6) **Conclusão e próximos passos**
-7) **Limitações e avisos**
-
-Siga estritamente estas ordens sem fazer alterações não pedidas.
+ESTRUTURA OBRIGATÓRIA:
+1) Síntese fática; 2) Classificação; 3) Enquadramento (Base GitHub); 4) Hermenêutica; 5) Análise aplicada (Nexo Causal se necessário); 6) Conclusão; 7) Avisos.
 `;
+
 const ASSINATURA_FIXA = `
 Todos os direitos reservados a Luís Filipe dos Santos Tembe Júnior.
-Se desejar apoiar esta iniciativa, pode fazer uma doação via:
-
-E-Mola: 860420733
-BIM (NIB): 1099450284
+Doações: E-Mola: 860420733 | BIM (NIB): 1099450284
 `;
+
+// Função para buscar legislação no seu GitHub
+async function buscarLegislacaoNoGithub(caminhoArquivo) {
+    const GITHUB_TOKEN = process.env.GITHUB_TOKEN; // Configure esta variável na Vercel
+    const REPO_OWNER = "SEU_USUARIO_GITHUB"; 
+    const REPO_NAME = "NOME_DO_REPOSITORIO";
+
+    try {
+        const response = await fetch(
+            `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${caminhoArquivo}`,
+            {
+                headers: {
+                    Authorization: `token ${GITHUB_TOKEN}`,
+                    Accept: "application/vnd.github.v3.raw",
+                },
+            }
+        );
+        return response.ok ? await response.text() : "Legislação específica não encontrada no repositório.";
+    } catch (err) {
+        return "Erro ao acessar base de dados do GitHub.";
+    }
+}
 
 module.exports = async (req, res) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
@@ -36,36 +44,36 @@ module.exports = async (req, res) => {
 
     if (req.method === "OPTIONS") return res.status(200).end();
 
-    if (!process.env.GEMINI_API_KEY) {
-        return res.status(500).json({ error: "Erro: GEMINI_API_KEY não configurada." });
-    }
-
     try {
         const { GoogleGenerativeAI } = await import("@google/generative-ai");
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({
-            model: "gemini-1.5-flash",
-            systemInstruction: SISTEMA_JURISTUTOR_MZ,
-        });
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", systemInstruction: SISTEMA_JURISTUTOR_MZ });
 
         const body = req.body || {};
-        let promptBruto = body.prompt || body.texto || "";
+        const casoEnviado = body.prompt || body.texto || "";
 
-        if (!promptBruto) {
-            return res.status(400).json({ error: "O campo de texto está vazio." });
-        }
+        // 1. Classificação rápida para decidir qual arquivo buscar
+        const classificacaoResult = await model.generateContent(`Classifique apenas a matéria deste caso em uma palavra (Ex: Civil, Penal, Familia): ${casoEnviado}`);
+        const materia = (await classificacaoResult.response).text().trim().toLowerCase();
 
-        // Comando adicional injetado para garantir o cumprimento das instruções de classificação e nexo causal
-        const promptFinal = `Analise o seguinte caso sob a legislação moçambicana, classificando a matéria e aplicando nexo causal pelo Código Civil se necessário:\n\n${promptBruto}`;
+        // 2. Busca o conteúdo no GitHub (Ex: arquivos com nome penal.txt, civil.txt)
+        const conteudoLegal = await buscarLegislacaoNoGithub(`legislacao/${materia}.txt`);
+
+        // 3. Gera a análise final com o contexto da lei
+        const promptFinal = `
+        LEGISLAÇÃO RECUPERADA: ${conteudoLegal}
+        CASO DO UTILIZADOR: ${casoEnviado}
+        
+        Realize a análise jurídica seguindo estritamente o protocolo JurisTutor MZ.
+        `;
 
         const result = await model.generateContent(promptFinal);
-        const response = await result.response;
-        const textoModelo = response.text();
+        const textoModelo = (await result.response).text();
 
-        const textoFinal = (textoModelo ? textoModelo.trim() : "Não foi possível gerar a análise.") + "\n\n" + ASSINATURA_FIXA;
-
-        return res.status(200).json({ text: textoFinal, resultado: textoFinal });
+        return res.status(200).json({ 
+            resultado: textoModelo.trim() + "\n\n" + ASSINATURA_FIXA 
+        });
     } catch (error) {
-        return res.status(500).json({ error: "Erro interno", details: error.message });
+        return res.status(500).json({ error: "Erro na análise." });
     }
 };
